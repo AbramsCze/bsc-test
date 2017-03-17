@@ -5,6 +5,8 @@ import eu.greyson.bsc.bscTest.service.dto.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import java.io.IOException;
@@ -17,12 +19,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class PaymentTracker implements ApplicationRunner {
     private static final String QUIT_COMMAND = "quit";
     private final PaymentService paymentService;
+    private final ApplicationContext applicationContext;
 
     private Queue<Payment> payments = new ConcurrentLinkedQueue<>();
 
     @Autowired
-    public PaymentTracker(PaymentService paymentService) throws IOException {
+    public PaymentTracker(PaymentService paymentService, ApplicationContext applicationContext) throws IOException {
         this.paymentService = paymentService;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -52,6 +56,9 @@ public class PaymentTracker implements ApplicationRunner {
                 System.err.printf("Payment: %s is not valid%n", data);
             }
             readFromConsole();
+        }
+        else {
+            SpringApplication.exit(applicationContext, () -> 0);
         }
     }
 
