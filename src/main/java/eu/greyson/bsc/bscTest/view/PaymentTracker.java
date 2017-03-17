@@ -8,9 +8,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /** Payment tracker implementation. */
 @Component
@@ -18,7 +18,7 @@ public class PaymentTracker implements ApplicationRunner {
     private static final String QUIT_COMMAND = "quit";
     private final PaymentService paymentService;
 
-    private List<Payment> payments = new ArrayList<>();
+    private Queue<Payment> payments = new ConcurrentLinkedQueue<>();
 
     @Autowired
     public PaymentTracker(PaymentService paymentService) throws IOException {
@@ -27,7 +27,7 @@ public class PaymentTracker implements ApplicationRunner {
 
     @Override
     public void run(final ApplicationArguments applicationArguments) throws Exception {
-        payments = paymentService.getAll("payments1");
+        payments = paymentService.getAllConcurrent("payments1");
         sendToConsole();
         readFromConsole();
     }

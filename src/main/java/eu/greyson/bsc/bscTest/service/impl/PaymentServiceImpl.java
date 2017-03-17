@@ -6,7 +6,8 @@ import eu.greyson.bsc.bscTest.service.dto.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 /** Payment service implementation. */
@@ -20,7 +21,10 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> getAll(String filename) throws IOException {
-        return paymentRepository.getAll(filename).filter(Payment::isPaymentValid).map(Payment::new).collect(Collectors.toList());
+    public Queue<Payment> getAllConcurrent(String filename) throws IOException {
+        return paymentRepository.getAll(filename)
+            .filter(Payment::isPaymentValid)
+            .map(Payment::new)
+            .collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
     }
 }
