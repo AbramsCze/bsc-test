@@ -14,7 +14,7 @@ public class Payment {
     /** Create payment object from line of file. */
     public Payment(String payment) {
         if(isPaymentValid(payment)) {
-            currency = payment.substring(0,2);
+            currency = payment.substring(0,3);
             amount = Integer.valueOf(payment.substring(3).trim());
         }
         else {
@@ -24,7 +24,7 @@ public class Payment {
 
     /** @return if payment have valid structure. */
     public static boolean isPaymentValid(String payment) {
-        return !StringUtils.isEmpty(payment) && payment.length() > 5;
+        return !StringUtils.isEmpty(payment) && payment.length() > 4 && payment.substring(3).matches(" ?-?\\d+");
     }
 
     /******************************************************************************************************************/
