@@ -2,39 +2,52 @@ package eu.greyson.bsc.bscTest.view;
 
 import eu.greyson.bsc.bscTest.service.PaymentService;
 import eu.greyson.bsc.bscTest.service.dto.Payment;
+import eu.greyson.bsc.bscTest.service.quartz.PaymentPrinterScheduler;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 /** Payment tracker implementation. */
 @Component
-@Scope("prototype")
+//@Scope("prototype")
 public class PaymentTracker implements ApplicationRunner {
     private static final String QUIT_COMMAND = "quit";
     private final PaymentService paymentService;
+    private final PaymentPrinterScheduler paymentPrinterScheduler;
 
-    private List<Payment> payments;
+    private List<Payment> payments = new ArrayList<>();
+    private Scheduler scheduler;
 
     @Autowired
-    public PaymentTracker(PaymentService paymentService) throws IOException {
+    public PaymentTracker(PaymentService paymentService, PaymentPrinterScheduler paymentPrinterScheduler) throws IOException {
         this.paymentService = paymentService;
+        this.paymentPrinterScheduler = paymentPrinterScheduler;
     }
 
     @Override
     public void run(final ApplicationArguments applicationArguments) throws Exception {
         payments = paymentService.getAll("payments1");
-        sendToConsole();
-        readFromConsole();
+
+        try {
+            scheduler = paymentPrinterScheduler.startScheduler();
+            sendToConsole();
+            readFromConsole();
+        }
+        catch (SchedulerException e) {
+            System.err.printf("Scheduler can't start%n");
+        }
     }
 
     /** Show all payments in console. */
-    private void sendToConsole() {
+    public void sendToConsole() {
         for(Payment payment : payments) {
             System.out.println(payment);
         }
@@ -53,6 +66,14 @@ public class PaymentTracker implements ApplicationRunner {
                 System.err.printf("Payment: %s is not valid%n", data);
             }
             readFromConsole();
+        }
+        else {
+            try {
+                paymentPrinterScheduler.stopScheduler(scheduler);
+            }
+            catch (SchedulerException e) {
+                System.err.printf("Scheduler can't stop%n");
+            }
         }
     }
 
