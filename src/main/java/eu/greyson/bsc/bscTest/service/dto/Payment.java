@@ -18,7 +18,7 @@ public class Payment {
             amount = Integer.valueOf(payment.substring(3).trim());
         }
         else {
-            throw new PaymentParseException(payment);
+            throw new PaymentParseException();
         }
     }
 
