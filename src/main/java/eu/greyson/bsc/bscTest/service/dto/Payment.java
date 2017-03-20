@@ -14,8 +14,8 @@ public class Payment {
     /** Create payment object from line of file. */
     public Payment(String payment) {
         if(isPaymentValid(payment)) {
-            currency = payment.substring(0,3);
-            amount = Integer.valueOf(payment.substring(3).trim());
+            setCurrency(payment.substring(0,3));
+            setAmount(Integer.valueOf(payment.substring(3).trim()));
         }
         else {
             throw new PaymentParseException();
@@ -53,7 +53,7 @@ public class Payment {
     }
 
     public void setCurrency(String currency) {
-        this.currency = currency;
+        this.currency = currency.toUpperCase();
     }
 
     public Integer getAmount() {
