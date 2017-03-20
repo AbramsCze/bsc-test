@@ -1,4 +1,8 @@
 # BSC test application
+Console application which print to output a list of all the currency and amounts to the console once per minute.
+You can write your own currency and amounts in format `USD 100`.
+You can stop program if you write `quit`.
+
 ## Run from IDE
 as standard spring boot application or via maven:
 ```
