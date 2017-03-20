@@ -27,7 +27,26 @@ public class Payment {
         return !StringUtils.isEmpty(payment) && payment.length() > 4 && payment.substring(3).matches(" ?-?\\d+");
     }
 
+    /** Add new amount. */
+    public void addAmount(Integer amount) {
+        this.amount += amount;
+    }
+
     /******************************************************************************************************************/
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        Payment payment = (Payment) o;
+        return getCurrency().equals(payment.getCurrency());
+    }
+
+    @Override
+    public int hashCode() {
+        return getCurrency().hashCode();
+    }
 
     public String getCurrency() {
         return currency;

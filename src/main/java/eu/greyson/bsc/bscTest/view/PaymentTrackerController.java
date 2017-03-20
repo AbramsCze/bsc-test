@@ -3,6 +3,7 @@ package eu.greyson.bsc.bscTest.view;
 import eu.greyson.bsc.bscTest.exception.FileNotFoundException;
 import eu.greyson.bsc.bscTest.service.PaymentService;
 import eu.greyson.bsc.bscTest.service.dto.Payment;
+import eu.greyson.bsc.bscTest.service.dto.PaymentsQueue;
 import eu.greyson.bsc.bscTest.view.manager.impl.ConsoleManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /** Payment tracker implementation. */
 @Component
@@ -28,7 +28,7 @@ public class PaymentTrackerController implements ApplicationRunner {
     private final ApplicationContext applicationContext;
     private final ConsoleManager consoleManager;
 
-    private Queue<Payment> payments = new ConcurrentLinkedQueue<>();
+    private Queue<Payment> payments = new PaymentsQueue();
 
     @Autowired
     public PaymentTrackerController(PaymentService paymentService, ApplicationContext applicationContext, ConsoleManager consoleManager) throws IOException {
