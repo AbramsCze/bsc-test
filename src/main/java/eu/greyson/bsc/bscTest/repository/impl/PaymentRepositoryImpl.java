@@ -4,13 +4,12 @@ import eu.greyson.bsc.bscTest.exception.FileNotFoundException;
 import eu.greyson.bsc.bscTest.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.Optional;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 /** Payments repository implementation. */
@@ -19,32 +18,22 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Value("${payment.file.suffix}") private String fileSuffix;
     @Value("${payment.storage.directory}") private String storageDirectory;
 
-    private Optional<File> storage = Optional.empty();
-
     @Override
-    public Stream<String> getAll(String filename) throws URISyntaxException, IOException {
-        Stream<String> data = Stream.empty();
+    public Stream<String> getAll(String filename) throws IOException {
+        List<String> fileContent = new LinkedList<>();
+        InputStream is = getClass().getResourceAsStream(String.format("%s/%s.%s", storageDirectory, filename, fileSuffix));
 
-        if(getStorage().isPresent()) {
-            File payments = new File(getStorage().get(), String.format("%s.%s", filename, fileSuffix));
+        if(is != null) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-            if (payments.exists()) {
-                data = Files.lines(payments.toPath(), StandardCharsets.UTF_8);
+            String line;
+            while ((line = br.readLine()) != null) {
+                fileContent.add(line);
             }
-            else {
-                throw new FileNotFoundException();
-            }
+            return fileContent.stream();
         }
-        return data;
-    }
-
-    /** @return payment storage directory or empty, if storage is not valid. */
-    private Optional<File> getStorage() throws URISyntaxException {
-        if(!storage.isPresent()) {
-            if(!StringUtils.isEmpty(storageDirectory)) {
-                storage = Optional.of(new File(getClass().getResource(storageDirectory).getPath()));
-            }
+        else {
+            throw new FileNotFoundException();
         }
-        return storage;
     }
 }

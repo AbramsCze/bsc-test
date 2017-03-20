@@ -1,7 +1,6 @@
 package eu.greyson.bsc.bscTest.repository;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.stream.Stream;
 
 /** Payments repository interface. */
@@ -11,5 +10,5 @@ public interface PaymentRepository {
      * @param filename of file to read.
      * @return all payments from file.
      */
-    Stream<String> getAll(String filename) throws IOException, URISyntaxException;
+    Stream<String> getAll(String filename) throws IOException;
 }

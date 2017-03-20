@@ -14,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Queue;
 
@@ -48,7 +47,7 @@ public class PaymentTrackerController implements ApplicationRunner {
                 try {
                     payments.addAll(paymentService.getAllConcurrent(data));
                 }
-                catch (IOException | URISyntaxException | FileNotFoundException e) {
+                catch (IOException | FileNotFoundException e) {
                     consoleManager.writeError("File: %s not found", data);
                 }
             });
