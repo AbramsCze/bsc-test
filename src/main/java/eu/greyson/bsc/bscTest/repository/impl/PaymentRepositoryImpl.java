@@ -42,7 +42,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     private Optional<File> getStorage() throws URISyntaxException {
         if(!storage.isPresent()) {
             if(!StringUtils.isEmpty(storageDirectory)) {
-                storage = Optional.of(new File(getClass().getResource(storageDirectory).toURI()));
+                storage = Optional.of(new File(getClass().getResource(storageDirectory).getPath()));
             }
         }
         return storage;
