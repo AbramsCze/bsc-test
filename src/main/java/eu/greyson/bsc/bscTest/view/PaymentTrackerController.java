@@ -2,6 +2,7 @@ package eu.greyson.bsc.bscTest.view;
 
 import eu.greyson.bsc.bscTest.service.PaymentService;
 import eu.greyson.bsc.bscTest.service.dto.Payment;
+import eu.greyson.bsc.bscTest.view.manager.impl.ConsoleManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -10,28 +11,50 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /** Payment tracker implementation. */
 @Component
-public class PaymentTracker implements ApplicationRunner {
+public class PaymentTrackerController implements ApplicationRunner {
     private static final String QUIT_COMMAND = "quit";
+    private static final String APPLICATION_ARGUMENT_FILE_KEY = "data";
+    private static final String APPLICATION_DEFAULT_FILE = "payments1";
+
     private final PaymentService paymentService;
     private final ApplicationContext applicationContext;
+    private final ConsoleManager consoleManager;
 
     private Queue<Payment> payments = new ConcurrentLinkedQueue<>();
 
     @Autowired
-    public PaymentTracker(PaymentService paymentService, ApplicationContext applicationContext) throws IOException {
+    public PaymentTrackerController(PaymentService paymentService, ApplicationContext applicationContext, ConsoleManager consoleManager) throws IOException {
         this.paymentService = paymentService;
         this.applicationContext = applicationContext;
+        this.consoleManager = consoleManager;
     }
 
     @Override
     public void run(final ApplicationArguments applicationArguments) throws Exception {
-        payments = paymentService.getAllConcurrent("payments1");
+        List<String> dataFiles;
+
+        if(applicationArguments.containsOption(APPLICATION_ARGUMENT_FILE_KEY)) {
+            dataFiles = applicationArguments.getOptionValues(APPLICATION_ARGUMENT_FILE_KEY);
+        }
+        else {
+            dataFiles = Collections.singletonList(APPLICATION_DEFAULT_FILE);
+        }
+
+        dataFiles.forEach(data -> {
+            try {
+                payments.addAll(paymentService.getAllConcurrent(data));
+            }
+            catch (IOException e) {
+                consoleManager.writeError("File: %s not found", data);
+            }
+        });
         sendToConsole();
         readFromConsole();
     }
@@ -39,21 +62,20 @@ public class PaymentTracker implements ApplicationRunner {
     /** Show all payments in console. */
     public void sendToConsole() {
         for(Payment payment : payments) {
-            System.out.println(payment);
+            consoleManager.writePayment(payment);
         }
     }
 
     /** Read text from console until quit command is received. */
     private void readFromConsole() {
-        Scanner scanInput = new Scanner(System.in);
-        String data = scanInput.nextLine();
+        String data = consoleManager.readInput();
 
         if(!isQuitCommand(data)) {
             if(Payment.isPaymentValid(data)) {
                 payments.add(new Payment(data));
             }
             else {
-                System.err.printf("Payment: %s is not valid%n", data);
+                consoleManager.writeError("Payment: %s is not valid", data);
             }
             readFromConsole();
         }
