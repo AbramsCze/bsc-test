@@ -6,6 +6,7 @@ import eu.greyson.bsc.bscTest.service.dto.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Queue<Payment> getAllConcurrent(String filename) throws IOException {
+    public Queue<Payment> getAllConcurrent(String filename) throws IOException, URISyntaxException {
         return paymentRepository.getAll(filename)
             .filter(Payment::isPaymentValid)
             .map(Payment::new)

@@ -16,7 +16,7 @@ public class PaymentPrinterServiceImpl implements PaymentPrinterService {
         this.paymentTracker = paymentTracker;
     }
 
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(fixedRateString = "${payment.scheduled.fixedRate}")
     @Override
     public void continuousSendToOutput() {
         paymentTracker.sendToConsole();
