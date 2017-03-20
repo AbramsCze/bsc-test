@@ -56,6 +56,7 @@ public class PaymentTrackerController implements ApplicationRunner {
         }
         else {
             consoleManager.writeError("No file to read");
+            readFromConsole();
         }
     }
 
